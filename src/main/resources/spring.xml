@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0..xsd
+		http://www.springframework.org/schema/aop	http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+	  	http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd
+">
+    <!-- 扫描默认包下的所有的@Component注解，并且自动注册到容器中， 同时也扫描@Controller，@Service，@Respository这三个注解，他们是继承自@Component。 
+        Spring根容器负责所有其他非controller的Bean的注册 -->
+    <context:component-scan base-package="com.et.springwebapp">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+
+    <!-- mybatis 数据源 -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+    </bean>
+    <!-- mybatis Session -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- mybatis dao配置文件 -->
+        <property name="mapperLocations" value="classpath:com/et/springwebapp/mapper/mybatis/*.xml" />
+    </bean>
+    <!-- mybatis dao接口文件 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.et.springwebapp.mapper" />
+    </bean>
+
+    <!-- 事务管理 -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <!-- 注解驱动事务 -->
+    <tx:annotation-driven transaction-manager="txManager" />
+    <!-- 激活事务的方法 -->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="find*" read-only="true" propagation="REQUIRED" />
+            <tx:method name="query*" propagation="REQUIRED" />
+            <tx:method name="save*" propagation="REQUIRED" />
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <!--rollback-for="Exception" spring 有默认exception捕捉-->
+            <tx:method name="del*" propagation="REQUIRED" rollback-for="Exception" />
+            <tx:method name="mod*" propagation="REQUIRED" rollback-for="Exception" />
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- service的方法是一个事务, 方法名称如上id="txAdvice"定义 -->
+    <aop:aspectj-autoproxy />
+    <aop:config>
+        <aop:pointcut id="allServiceMethods" expression="execution(* com.et.springwebapp.service.impl.*.*(..))" />
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="allServiceMethods" />
+    </aop:config>
+</beans>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SqlUtil">
+
+    <!-- <sql>用来封装SQL语句, <include>来调用 -->
+
+    <!-- 直接运行sql语句 -->
+    <sql id="sql">
+        ${sql}
+    </sql>
+
+    <!-- 新增对象非null值，必须有dmId -->
+    <sql id="add">
+        insert into ${tableName}
+        <foreach collection="data.keys" item="key" open="(" close=")" separator="," >
+            ${key}
+        </foreach>
+        values
+        <foreach collection="data.keys"  item="key" open="(" close=")" separator=",">
+            #{data[${key}]}
+        </foreach>
+    </sql>
+
+    <!-- 更新对象非null值，必须有id -->
+    <sql id="update">
+        update ${tableName} set
+        <foreach collection="data.keys" item="key" separator="," >
+            <if test="key != 'id' and data[key] != null">
+                ${key} = #{data[${key}]}
+            </if>
+        </foreach>
+        where id = #{data[id]}
+    </sql>
+
+    <!-- group -->
+    <sql id="group">
+        <trim prefix=" group by " suffixOverrides=",">
+            <if test="groupName!=null and groupName!=''">
+                ${groupName}
+            </if>
+            <if test="groupList">
+                <foreach collection="groupList" item="gl" separator=",">
+                    ${gl}
+                </foreach>
+            </if>
+        </trim>
+    </sql>
+
+    <!-- order, orderBy如：t.createTime desc, a.count asc -->
+    <sql id="order">
+        <trim prefix=" order by ">
+            <if test="orderBy != null and orderBy != '' ">
+                ${orderBy}
+            </if>
+        </trim>
+    </sql>
+
+    <!-- pager -->
+    <sql id="page">
+        <trim prefix=" limit ">
+            <if test="page!=null and rows!=null ">
+                ${(page-1) * rows },${rows}
+            </if>
+        </trim>
+    </sql>
+
+    <!-- having -->
+    <sql id="having">
+        <trim prefix=" having ">
+            <if test="havingName!=null and havingValue!=null and havingSymbol!=null">
+                ${havingName} ${havingSymbol} #{havingValue}
+            </if>
+        </trim>
+    </sql>
+</mapper>

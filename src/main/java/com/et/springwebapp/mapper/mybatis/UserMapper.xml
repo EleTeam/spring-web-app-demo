@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.et.springwebapp.mapper.UserMapper">
+
+    <!-- et_student 表字段 -->
+    <resultMap id="User" type="com.et.springwebapp.entity.User"></resultMap>
+    <parameterMap id="User" type="com.et.springwebapp.entity.User"></parameterMap>
+
+    <sql id="where"><where>
+        <if test="id != null ">and id = #{id}</if>
+        <if test="status != null ">and status = #{status}</if>
+    </where></sql>
+
+    <insert id="add"><include refid="SqlUtil.add"/></insert>
+
+    <update id="update"><include refid="SqlUtil.update"/></update>
+
+    <select id="find" parameterMap="User" resultMap="User">
+        select * from et_student <include refid="where"/> limit 1
+    </select>
+</mapper>
