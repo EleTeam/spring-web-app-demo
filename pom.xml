@@ -2,10 +2,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.et</groupId>
-    <artifactId>springwebapp</artifactId>
+    <artifactId>spring-web-app-demo</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>springwebapp Maven Webapp</name>
+
+    <name>spring-web-app-demo</name>
     <url>http://maven.apache.org</url>
 
     <properties>
