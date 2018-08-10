@@ -76,6 +76,12 @@
             <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.et.dubbo</groupId>
+            <artifactId>dubbo-id-spi</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <!-- 编译 -->
